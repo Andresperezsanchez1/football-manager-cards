@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123d2b">
+<title>Football Manager Cards</title>
+<style>
+:root{--bg:#0c1712;--panel:#14251c;--panel2:#1c3326;--green:#36d17c;--gold:#ffd166;--text:#f4f7f4;--muted:#a9b9ae;--red:#ff7777}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#10271b,#08110d);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh}
+header{padding:18px 16px 12px;max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;letter-spacing:.3px;font-size:clamp(19px,4vw,27px)}.brand span{color:var(--green)}
+.pill{border:1px solid #365443;background:#12271b;border-radius:999px;padding:8px 12px;color:var(--gold);font-weight:800;white-space:nowrap}
+main{max-width:1100px;margin:auto;padding:0 14px 28px}
+nav{display:flex;gap:8px;overflow:auto;padding:8px 0 14px;position:sticky;top:0;background:#0c1b13ee;z-index:5}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 14px;font-weight:800;color:#0b1a11;background:var(--green);transition:transform .12s,filter .12s}
+button:active{transform:scale(.97)}button.secondary{background:#294535;color:var(--text);border:1px solid #45634f}button.gold{background:var(--gold)}button:disabled{opacity:.4;cursor:not-allowed}
+nav button{white-space:nowrap;padding:10px 13px}nav button.active{background:var(--green);color:#08150d}
+.view{display:none}.view.active{display:block}.hero{background:linear-gradient(120deg,#1d4930,#12291d);border:1px solid #31573d;border-radius:20px;padding:20px;margin-bottom:15px}
+h1,h2,h3,p{margin-top:0}h1{font-size:clamp(24px,5vw,36px);margin-bottom:8px}h2{font-size:22px;margin-bottom:12px}h3{font-size:16px;margin-bottom:8px}.sub{color:var(--muted);line-height:1.5}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}.stat{background:#0e2117;border-radius:13px;padding:12px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:var(--panel);border:1px solid #2d4938;border-radius:16px;padding:12px;position:relative;overflow:hidden}.player-card{background:linear-gradient(145deg,#244c35,#12291d 75%);border:1px solid #6b9872;text-align:center;min-height:190px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px}.player-card.rare{background:linear-gradient(145deg,#67501d,#2b2716 78%);border-color:#d8b45d}.rating{position:absolute;top:10px;left:10px;font-size:22px;font-weight:950;color:var(--gold)}.avatar{font-size:43px;margin-top:16px}.player-name{font-weight:900}.position{color:var(--muted);font-size:12px}.attributes{display:flex;gap:10px;font-size:11px;color:#d8e6dc}.attributes b{color:white;font-size:13px}.price{color:var(--gold);font-weight:900}
+.pitch{border:3px solid #d3efce;border-radius:14px;background:repeating-linear-gradient(0deg,#267a43 0,#267a43 52px,#2d874a 52px,#2d874a 104px);padding:15px;min-height:390px;position:relative;display:flex;flex-direction:column;justify-content:space-around;overflow:hidden}.pitch:before{content:"";position:absolute;inset:20% 10%;border:2px solid #d3efce88;border-radius:50%;pointer-events:none}.pitch:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px solid #d3efce88}.line{display:flex;justify-content:space-around;position:relative;z-index:1;gap:4px}.shirt{width:57px;min-height:62px;border-radius:10px;background:#f2f5ed;color:#143a24;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:21px;box-shadow:0 3px 0 #14502b;font-weight:900;padding:3px}.shirt small{font-size:9px;max-width:54px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.pitch-label{position:absolute;bottom:8px;right:9px;color:#ffffffa8;font-size:10px;z-index:2}
+.notice{padding:12px;border-radius:12px;background:#203b2a;color:#dcefe0;margin:10px 0;line-height:1.45}.notice.error{background:#482525;color:#ffdada}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 12px}.matchbox{background:var(--panel);border:1px solid #2d4938;border-radius:18px;padding:18px;text-align:center}.score{font-size:46px;font-weight:950;letter-spacing:4px;margin:12px}.teamnames{display:flex;justify-content:space-around;gap:10px;color:var(--muted);font-size:13px}.log{text-align:left;max-height:180px;overflow:auto;color:var(--muted);font-size:13px;line-height:1.6;margin:12px 0}.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+footer{text-align:center;color:#728779;font-size:11px;padding:24px 10px}
+@media(min-width:760px){.layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pitch{min-height:500px}.player-card{min-height:205px}}
+</style>
+</head>
+<body>
+<header><div class="brand">⚽ FOOTBALL <span>MANAGER CARDS</span></div><div class="pill">🪙 <span id="coinsTop">500</span></div></header>
+<main>
+<nav>
+<button class="active" data-tab="club">🏟️ Mi club</button>
+<button data-tab="market">🛒 Fichajes</button>
+<button data-tab="match">⚽ Partido</button>
+<button data-tab="collection">🃏 Cartas</button>
+</nav>
+<section class="view active" id="club">
+<div class="hero"><h1>Construye tu club.</h1><p class="sub">Ficha jugadores, mejora tu once y gana partidos. Esta primera versión guarda tu progreso en este navegador.</p>
+<div class="stats"><div class="stat"><strong id="teamRating">—</strong><span>Valoración del once</span></div><div class="stat"><strong id="wins">0</strong><span>Victorias</span></div><div class="stat"><strong id="played">0</strong><span>Partidos jugados</span></div></div></div>
+<div class="layout"><div><div class="section-head"><h2>Tu alineación</h2><span class="small">4-3-3</span></div><div class="pitch" id="pitch"></div><p class="small">Pulsa en una carta de tu colección para incorporarla si hay hueco.</p></div>
+<div><div class="section-head"><h2>Resumen del club</h2></div><div class="card"><h3>Objetivo de la temporada</h3><p class="sub">Consigue 3 victorias para convertirte en un club destacado.</p><div style="height:9px;background:#0b1710;border-radius:9px;overflow:hidden"><div id="progress" style="height:100%;width:0;background:var(--green)"></div></div><p class="small" id="progressText">0 de 3 victorias</p><button class="gold" onclick="go('match')">Jugar un partido</button></div><div class="notice" id="clubMessage">¡Bienvenido, entrenador! Empieza en el mercado para reforzar tu plantilla.</div></div></div>
+</section>
+<section class="view" id="market">
+<div class="hero"><h1>Mercado de fichajes</h1><p class="sub">Compra jugadores con tus monedas. Cada jugador comprado pasa a tu colección.</p><div class="stats"><div class="stat"><strong id="marketCoins">500</strong><span>Monedas disponibles</span></div><div class="stat"><strong id="ownedCount">5</strong><span>Cartas en tu colección</span></div><div class="stat"><strong id="marketRating">—</strong><span>Media de tu once</span></div></div></div>
+<div class="section-head"><h2>Jugadores disponibles</h2><button class="secondary" onclick="refreshMarket()">🔄 Renovar mercado</button></div><div class="grid" id="marketGrid"></div><p class="small">En esta demo, el mercado se genera localmente. Los nombres y jugadores son ficticios.</p>
+</section>
+<section class="view" id="match">
+<div class="hero"><h1>Día de partido</h1><p class="sub">Tu once se enfrenta a un rival controlado por la máquina. La valoración y un factor aleatorio influyen en el resultado.</p></div>
+<div class="matchbox"><div class="teamnames"><strong>🟢 TU CLUB</strong><strong>🔴 RIVAL FC</strong></div><div class="score" id="score">— : —</div><p id="matchStatus" class="sub">Cuando estés listo, salta al campo.</p><div class="actions"><button onclick="playMatch()">▶ Jugar partido</button><button class="secondary" onclick="go('club')">Ver alineación</button></div><div class="log" id="matchLog"></div></div>
+<div class="notice">Recompensa: 100 monedas por victoria, 50 por empate y 25 por derrota.</div>
+</section>
+<section class="view" id="collection">
+<div class="hero"><h1>Mi colección</h1><p class="sub">Tus cartas y sus atributos. Pulsa “Alinear” para colocar jugadores en tu once.</p></div><div class="grid" id="collectionGrid"></div>
+</section>
+<footer>Prototipo educativo · No incluye todavía cuentas ni multijugador online · Progreso guardado en este dispositivo</footer>
+</main>
+<script>
+const starter=[
+{id:1,name:"Leo Rivas",pos:"DEL",rating:74,atk:82,def:35,stam:76,price:0,emoji:"⚡",owned:true},
+{id:2,name:"Dani Costa",pos:"MED",rating:71,atk:69,def:65,stam:78,price:0,emoji:"🎯",owned:true},
+{id:3,name:"Álex Vega",pos:"DEF",rating:70,atk:45,def:79,stam:73,price:0,emoji:"🛡️",owned:true},
+{id:4,name:"Pablo Sol",pos:"POR",rating:68,atk:20,def:82,stam:68,price:0,emoji:"🧤",owned:true},
+{id:5,name:"Izan Mora",pos:"MED",rating:67,atk:66,def:62,stam:71,price:0,emoji:"🚀",owned:true}
+];
+const names=["Mario Luna","Nico Torres","Sergio Vidal","Adrián León","Hugo Martín","Eric Romero","Bruno Gil","Gael Reyes","Marco Cruz","Iker Santos","Joel Navarro","Lucas Peña","Rafa Molina","Teo Campos","Iván Flores","Samuel Ruiz","Pol Herrera","Dario Cano"];
+const emojis=["⚡","🎯","🛡️","🧤","🚀","🔥","💎","🦅"];
+let state;
+function freshState(){return {coins:500,wins:0,played:0,nextId:100,players:starter.map(p=>({...p})),market:[],lineup:[1,2,3,4,5,null,null,null,null,null,null]};}
+function load(){try{const s=JSON.parse(localStorage.getItem("fmc-save"));if(s&&Array.isArray(s.players))return s}catch(e){}return freshState()}
+state=load();
+function save(){localStorage.setItem("fmc-save",JSON.stringify(state));render()}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function generatePlayer(){const pos=["DEL","MED","DEF","POR"][rand(0,3)],rating=rand(57,84);return {id:state.nextId++,name:names[rand(0,names.length-1)],pos,rating,atk:Math.max(25,Math.min(95,rating+rand(-12,14))),def:Math.max(25,Math.min(95,rating+rand(-15,12))),stam:rand(55,91),price:Math.max(80,(rating-48)*18),emoji:emojis[rand(0,emojis.length-1)],owned:false}}
+function refreshMarket(){state.market=Array.from({length:6},generatePlayer);save()}
+if(!state.market||!state.market.length)state.market=Array.from({length:6},generatePlayer);
+function getPlayer(id){return state.players.find(p=>p.id===id)}
+function aligned(){return state.lineup.map(getPlayer).filter(Boolean)}
+function rating(){const a=aligned();return a.length?Math.round(a.reduce((s,p)=>s+p.rating,0)/a.length):0}
+function go(tab){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===tab));}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+function cardHTML(p,market=false){const rare=p.rating>=80?"rare":"";return `<article class="card player-card ${rare}"><div class="rating">${p.rating}</div><div class="avatar">${p.emoji}</div><div><div class="player-name">${p.name}</div><div class="position">${p.pos} · ${p.rating>=80?"ÉLITE":p.rating>=70?"DESTACADO":"PROMESA"}</div></div><div class="attributes"><span>ATA <b>${p.atk}</b></span><span>DEF <b>${p.def}</b></span><span>RES <b>${p.stam}</b></span></div>${market?`<div class="price">🪙 ${p.price}</div><button onclick="buyPlayer(${p.id})" ${state.coins<p.price?"disabled":""}>Fichar</button>`:`<button class="secondary" onclick="alignPlayer(${p.id})">Alinear</button>`}</article>`}
+function buyPlayer(id){const p=state.market.find(x=>x.id===id);if(!p||state.coins<p.price)return;state.coins-=p.price;state.players.push({...p,owned:true});state.market=state.market.filter(x=>x.id!==id);state.market.push(generatePlayer());document.getElementById("clubMessage").textContent=`¡Has fichado a ${p.name}! Ya está en tu colección.`;save()}
+function alignPlayer(id){let idx=state.lineup.findIndex(x=>x===null);if(idx<0){idx=state.lineup.findIndex(x=>x===id);if(idx>=0){document.getElementById("clubMessage").textContent="Ese jugador ya está alineado.";return}document.getElementById("clubMessage").textContent="Tu once está completo. Para cambiar un jugador, primero pulsa en una camiseta del campo.";return}if(state.lineup.includes(id)){document.getElementById("clubMessage").textContent="Ese jugador ya está en el once.";return}state.lineup[idx]=id;document.getElementById("clubMessage").textContent=`${getPlayer(id).name} entra en tu alineación.`;save()}
+function removeFromLineup(id){state.lineup[id]=null;save()}
+function renderPitch(){const pitch=document.getElementById("pitch");const rows=[[10],[7,8,9],[4,5,6],[1,2,3]];pitch.innerHTML=rows.map((row,r)=>`<div class="line">${row.map(n=>{const slot=(r===0?0:r===1?n-1:n-1);const id=state.lineup[slot];const p=id?getPlayer(id):null;return `<button class="shirt" title="${p?p.name:"Hueco libre"}" onclick="${p?`removeFromLineup(${slot})`:`go('collection')`}" style="${p?"":"opacity:.6"}">${p?p.emoji:"＋"}<small>${p?p.name:"Libre"}</small><small>${p?p.rating:"Añadir"}</small></button>`}).join("")}</div>`).join("")+`<span class="pitch-label">Toca una camiseta para liberar el hueco</span>`}
+function playMatch(){const my=rating();if(aligned().length<3){document.getElementById("matchStatus").textContent="Alinea al menos 3 jugadores antes de jugar.";return}const rival=rand(62,78),myGoals=Math.max(0,Math.round((my-rival)/13+rand(0,2))),theirGoals=Math.max(0,Math.round((rival-my)/13+rand(0,2)));state.played++;if(myGoals>theirGoals){state.wins++;state.coins+=100;document.getElementById("matchStatus").textContent="¡Victoria! Has ganado 100 monedas."}else if(myGoals===theirGoals){state.coins+=50;document.getElementById("matchStatus").textContent="Empate. Has ganado 50 monedas."}else{state.coins+=25;document.getElementById("matchStatus").textContent="Derrota. Has ganado 25 monedas por participar."}document.getElementById("score").textContent=`${myGoals} : ${theirGoals}`;document.getElementById("matchLog").innerHTML=[`• Tu valoración: ${my}`,`• Valoración rival: ${rival}`,`• El resultado se ha simulado según la media del equipo y el azar.`].join("<br>");save()}
+function render(){document.getElementById("coinsTop").textContent=state.coins;document.getElementById("marketCoins").textContent=state.coins;document.getElementById("ownedCount").textContent=state.players.length;document.getElementById("teamRating").textContent=rating();document.getElementById("marketRating").textContent=rating();document.getElementById("wins").textContent=state.wins;document.getElementById("played").textContent=state.played;document.getElementById("progress").style.width=Math.min(100,state.wins/3*100)+"%";document.getElementById("progressText").textContent=`${Math.min(state.wins,3)} de 3 victorias`;renderPitch();document.getElementById("marketGrid").innerHTML=state.market.map(p=>cardHTML(p,true)).join("");document.getElementById("collectionGrid").innerHTML=state.players.map(p=>cardHTML(p,false)).join("")}
+function resetGame(){if(confirm("¿Borrar todo el progreso y empezar de nuevo?")){state=freshState();state.market=Array.from({length:6},generatePlayer);save()}}
+render();
+</script>
+</body>
+</html>
