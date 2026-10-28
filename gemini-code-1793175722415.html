@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#123d2b">
+<title>Football Manager Cards V31 - DLS 3D Edition</title>
+<!-- Tailwind CSS y FontAwesome para la interfaz y controles DLS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Three.js 3D Physics Engine -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+:root{--bg:#0c1712;--panel:#14251c;--panel2:#1c3326;--green:#36d17c;--gold:#ffd166;--text:#f4f7f4;--muted:#a9b9ae;--red:#ff7777}
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+body{margin:0;background:linear-gradient(180deg,#10271b,#08110d);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;min-height:100vh;overflow-x:hidden}
+header{padding:18px 16px 12px;max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;letter-spacing:.3px;font-size:clamp(19px,4vw,27px)}.brand span{color:var(--green)}
+.pill{border:1px solid #365443;background:#12271b;border-radius:999px;padding:8px 12px;color:var(--gold);font-weight:800;white-space:nowrap}
+main{max-width:1100px;margin:auto;padding:0 14px 28px}
+nav{display:flex;gap:8px;overflow:auto;padding:8px 0 14px;position:sticky;top:0;background:#0c1b13ee;z-index:30}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:11px 14px;font-weight:800;color:#0b1a11;background:var(--green);transition:transform .12s,filter .12s}
+button:active{transform:scale(.97)}button.secondary{background:#294535;color:var(--text);border:1px solid #45634f}button.gold{background:var(--gold)}button:disabled{opacity:.4;cursor:not-allowed}
+nav button{white-space:nowrap;padding:10px 13px}nav button.active{background:var(--green);color:#08150d}
+.view{display:none}.view.active{display:block}.hero{background:linear-gradient(120deg,#1d4930,#12291d);border:1px solid #31573d;border-radius:20px;padding:20px;margin-bottom:15px}
+h1,h2,h3,p{margin-top:0}h1{font-size:clamp(24px,5vw,36px);margin-bottom:8px}h2{font-size:22px;margin-bottom:12px}h3{font-size:16px;margin-bottom:8px}.sub{color:var(--muted);line-height:1.5}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:9px;margin-top:18px}.stat{background:#0e2117;border-radius:13px;padding:12px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.card{background:var(--panel);border:1px solid #2d4938;border-radius:16px;padding:12px;position:relative;overflow:hidden}.player-card{background:linear-gradient(145deg,#244c35,#12291d 75%);border:1px solid #6b9872;text-align:center;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;padding-top:14px}.player-card.rare,.player-card.style-elite{background:linear-gradient(145deg,#67501d,#2b2716 78%);border-color:#f2d77b;box-shadow:inset 0 0 0 2px #d8b45d33}.player-card.style-bronze{background:linear-gradient(145deg,#825a3b,#302016 78%);border-color:#d6a47a}.player-card.style-silver{background:linear-gradient(145deg,#68767d,#20282d 78%);border-color:#d8e2e7}.player-card.style-gold{background:linear-gradient(145deg,#8b6b24,#2d2717 78%);border-color:#f5d46b}.player-card.style-icon{background:radial-gradient(ellipse at 50% 22%,#7e552d,#241b17 72%);border:2px solid #f3d8a0;box-shadow:inset 0 0 0 3px #d7ae6a55}.player-card.style-hero{background:linear-gradient(135deg,#5b2c75,#17254e 70%);border:2px solid #cf9cff;box-shadow:inset 0 0 0 2px #ffffff22}.card-type{font-size:9px;font-weight:950;letter-spacing:1.5px;text-transform:uppercase;opacity:.9}.rating{position:absolute;top:10px;left:10px;font-size:22px;font-weight:950;color:var(--gold);z-index:1}.avatar{font-size:43px;margin-top:14px;width:108px;height:94px;display:flex;align-items:center;justify-content:center;border-radius:10px;overflow:hidden;background:#07110c66;border:1px solid #ffffff22}.avatar a{display:block;width:100%;height:100%}.avatar img{display:block;width:100%;height:100%;object-fit:cover}.photo-credit{display:none!important}.player-name{font-weight:900}.position{color:var(--muted);font-size:12px}.attributes{display:flex;gap:10px;font-size:11px;color:#d8e6dc}.attributes b{color:white;font-size:13px}.price{color:var(--gold);font-weight:900}
+.pitch{border:3px solid #d3efce;border-radius:14px;background:repeating-linear-gradient(0deg,#267a43 0,#267a43 52px,#2d874a 52px,#2d874a 104px);padding:15px;min-height:390px;position:relative;display:flex;flex-direction:column;justify-content:space-around;overflow:hidden}.pitch:before{content:"";position:absolute;inset:20% 10%;border:2px solid #d3efce88;border-radius:50%;pointer-events:none}.pitch:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px solid #d3efce88}.line{display:flex;justify-content:space-around;position:relative;z-index:1;gap:4px}.shirt{width:57px;min-height:62px;border-radius:10px;background:#f2f5ed;color:#143a24;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:21px;box-shadow:0 3px 0 #14502b;font-weight:900;padding:3px}.shirt small{font-size:9px;max-width:54px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.pitch-label{position:absolute;bottom:8px;right:9px;color:#ffffffa8;font-size:10px;z-index:2}
+.toast{position:fixed;z-index:9999;left:50%;top:82px;transform:translateX(-50%);width:min(92vw,440px);padding:16px 18px;border:2px solid var(--gold);border-radius:16px;background:#14251c;box-shadow:0 12px 40px #000b;text-align:center;display:none}.toast.show{display:block;animation:toastIn .2s ease-out}.toast .toast-player{font-size:20px;font-weight:900;margin:6px 0}.bench-editor{margin-top:12px;padding:12px;background:#14251c;border:1px solid #36543f;border-radius:12px}.bench-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}.bench-options button{padding:10px;text-align:left}.notice{padding:12px;border-radius:12px;background:#203b2a;color:#dcefe0;margin:10px 0;line-height:1.45}.notice.error{background:#482525;color:#ffdada}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:18px 0 12px}.matchbox{background:var(--panel);border:1px solid #2d4938;border-radius:18px;padding:18px;text-align:center}.score{font-size:46px;font-weight:950;letter-spacing:4px;margin:12px}.teamnames{display:flex;justify-content:space-around;gap:10px;color:var(--muted);font-size:13px}.log{text-align:left;max-height:180px;overflow:auto;color:var(--muted);font-size:13px;line-height:1.6;margin:12px 0}.small{font-size:12px;color:var(--muted)}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+footer{text-align:center;color:#728779;font-size:11px;padding:24px 10px}
+@media(min-width:760px){.layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}.pitch{min-height:500px}.player-card{min-height:205px}}
+
+/* Casino Styles */
+.casino-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:14px 0}.casino-card{background:linear-gradient(145deg,#182d20,#101d16);border:1px solid #44684e;border-radius:16px;padding:18px}.casino-card h2{margin:0 0 8px}.casino-card label{display:block;margin:10px 0 5px;color:var(--muted);font-size:13px}.casino-card select,.casino-card input{width:100%;padding:11px;border-radius:10px;background:#0c1b13;color:#fff;border:1px solid #45634f}.casino-result{min-height:58px;padding:12px;border-radius:12px;background:#0b1710;margin-top:12px;line-height:1.5}.casino-result.win{border:1px solid #56c978;color:#b9ffcb}.casino-result.lose{border:1px solid #9c4c4c;color:#ffd1d1}.reels{display:flex;gap:8px;justify-content:center;margin:16px 0;perspective:500px}.reel{background:linear-gradient(180deg,#fffbe8,#e4d9ad);color:#16251a;border:3px solid #c9a84a;border-radius:12px;font-size:34px;font-weight:900;padding:12px 16px;min-width:62px;text-align:center;box-shadow:inset 0 0 0 2px #fff8,0 5px 0 #765d24;overflow:hidden}.reel.spinning{animation:reelPulse .12s linear infinite;filter:blur(.6px);background:linear-gradient(180deg,#fff,#d6c88c)}@keyframes reelPulse{0%{transform:translateY(-3px) scaleY(.92)}50%{transform:translateY(3px) scaleY(1.04)}100%{transform:translateY(-3px) scaleY(.92)}}
+.roulette-stage{width:min(100%,270px);aspect-ratio:1;margin:16px auto 18px;position:relative;display:grid;place-items:center;filter:drop-shadow(0 9px 9px #0008)}.roulette-wheel{width:100%;height:100%;border-radius:50%;position:relative;border:8px solid #b98a36;box-shadow:inset 0 0 0 4px #f4d77c,inset 0 0 0 8px #452b12,0 0 0 3px #21180e;background:#143f2c;transition:transform 5.5s cubic-bezier(.08,.72,.08,1);will-change:transform;overflow:hidden}.roulette-wheel:before{content:"";position:absolute;inset:8px;border:2px solid #f1d47a;border-radius:50%;z-index:1;pointer-events:none}.wheel-numbers{position:absolute;inset:0;border-radius:50%}.wheel-number{position:absolute;left:50%;top:50%;width:23px;height:27px;margin-left:-11.5px;margin-top:-13.5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#fff;text-shadow:0 1px 2px #000;transform-origin:center center;border:1px solid #d5b96a;box-shadow:0 0 0 1px #24190e}.wheel-number.red{background:#a71924}.wheel-number.black{background:#111713}.wheel-number.green{background:#08783d}.wheel-center{position:absolute;width:29%;height:29%;left:35.5%;top:35.5%;border-radius:50%;z-index:2;display:grid;place-items:center;background:radial-gradient(circle at 35% 30%,#f9e9a4,#b77c28 50%,#4d2e10 72%,#e5c35e 75%,#6a4318);border:4px ridge #e7c56d;box-shadow:0 0 0 4px #3b2411;color:#2c1a08;font-size:12px;font-weight:1000;letter-spacing:1px}.roulette-pointer{position:absolute;z-index:4;top:-2px;left:calc(50% - 12px);width:24px;height:32px;background:linear-gradient(90deg,#9b6b20,#fff1a8,#a66d1c);clip-path:polygon(50% 100%,0 0,100% 0);filter:drop-shadow(0 2px 2px #000);transform-origin:50% 0}.roulette-stage.spinning .roulette-pointer{animation:pointerTick .09s ease-in-out infinite alternate}@keyframes pointerTick{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+
+/* Pack Opening Overlay */
+.pack-opening-overlay{position:fixed;inset:0;z-index:10050;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at center,#183c2aee 0%,#050a08f5 72%);backdrop-filter:blur(8px);overflow:hidden;animation:openingFade .35s ease both;transition:opacity .4s ease}
+.pack-opening-overlay.closing{opacity:0;pointer-events:none}
+.pack-opening-overlay:before{content:"";position:absolute;inset:-30%;background:conic-gradient(from 0deg,transparent,#2bff9a22,#ffd16633,#8a5cff33,#2beaff33,transparent);animation:openingColors 4s linear infinite;pointer-events:none}
+.pack-opening-content{position:relative;z-index:1;width:min(94vw,520px);min-height:55vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:16px}
+.pack-opening-kicker{font-size:12px;letter-spacing:4px;font-weight:950;color:#b7d8c2;text-transform:uppercase}
+.pack-opening-title{font-size:clamp(25px,6vw,40px);font-weight:1000;line-height:1.05;text-shadow:0 0 22px #36d17c77;margin:0}
+.pack-opening-stage{width:100%;min-height:340px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.pack-opening-reveal{font-size:clamp(28px,8vw,54px);font-weight:1000;letter-spacing:1px;text-shadow:0 0 24px currentColor;animation:openingPop .45s cubic-bezier(.2,.9,.25,1) both;overflow-wrap:anywhere;text-align:center}
+.pack-opening-sub{font-size:14px;color:#c8dfcf;letter-spacing:2px;text-transform:uppercase;font-weight:800}
+.pack-opening-card{display:flex;justify-content:center;align-items:center;width:100%;animation:openingCard .65s cubic-bezier(.16,1,.3,1) both}
+.pack-opening-card .player-card{width:min(78vw,285px);min-height:370px;padding:16px 12px;box-shadow:0 0 30px #ffd16666,0 0 85px #36d17c33,inset 0 0 0 2px #ffffff22;transform:none}
+
+/* Player Card Clean Styles */
+.lineup-card{width:clamp(48px,7vw,76px);min-height:105px;max-height:118px;padding:5px 3px 7px;border-radius:9px 9px 12px 12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;position:relative;z-index:2;border:1.5px solid #e9dca1;color:#fff;background:linear-gradient(155deg,#c9a64e,#59421d 72%);box-shadow:0 3px 8px #001a0b99;overflow:hidden;cursor:pointer}
+.lineup-card:before{content:"";position:absolute;inset:3px;border:1px solid #ffffff66;border-radius:6px 6px 9px 9px;pointer-events:none}
+.lineup-card.style-bronze{background:linear-gradient(150deg,#d7a17a,#69402b 72%);border-color:#e7bd98}
+.lineup-card.style-silver{background:linear-gradient(150deg,#dce7ea,#53646d 72%);border-color:#f2ffff}
+.lineup-card.style-gold,.lineup-card.style-elite{background:linear-gradient(150deg,#ffe48a,#a87b24 48%,#433016 100%);border-color:#fff0a4}
+.lineup-card.style-icon{background:linear-gradient(150deg,#ffffff,#cfd6e0 48%,#536071);border-color:#ffffff}
+.lineup-card.style-hero{background:linear-gradient(150deg,#f3b4ff,#743a9d 48%,#1b2858);border-color:#f7d1ff}
+.lineup-card .lineup-rating{font-weight:1000;font-size:17px;line-height:1;text-shadow:0 1px 4px #000b;align-self:flex-start;padding-left:4px}
+.lineup-card .lineup-avatar{width:43px;height:43px;border:1px solid #ffffff88;border-radius:50% 50% 6px 6px;background:#08150c88;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:21px;flex-shrink:0}
+.lineup-card .lineup-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.lineup-card .lineup-name{font-size:8px;line-height:1.1;font-weight:950;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px #000b}
+.lineup-card .lineup-pos{font-size:8px;font-weight:900;letter-spacing:.5px}
+.lineup-card .lineup-flag{font-size:10px;line-height:1}
+.lineup-card.empty{background:#153f27aa;border:1px dashed #d7f1d4;color:#f2fff0;box-shadow:none;min-height:88px;justify-content:center}
+
+.player-card.simple-player{min-height:0!important;height:auto!important;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;text-align:left;padding:15px!important;border-radius:13px!important;clip-path:none!important;overflow:hidden!important;box-shadow:none!important;}
+.simple-rating{display:inline-flex;align-self:flex-start;align-items:center;justify-content:center;min-width:42px;padding:5px 9px;border-radius:8px;background:#f5c542;color:#17130a;font-size:22px;font-weight:1000;line-height:1}
+.simple-player-name{font-size:18px;font-weight:900;line-height:1.2;color:#fff}
+.simple-player-detail{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#f4f7f4;font-size:13px}
+.simple-pos{display:inline-flex;align-items:center;justify-content:center;min-width:38px;padding:4px 7px;border-radius:6px;background:#ffffff20;border:1px solid #ffffff55;font-size:11px;font-weight:900}
+.simple-player-team{display:flex;flex-direction:column;gap:3px;font-size:14px}
+.team-label{font-size:9px;letter-spacing:1.4px;font-weight:900;color:#ffffffa8}
+.simple-player-actions{display:flex;gap:7px;flex-wrap:wrap}
+
+/* DLS MOBILE 3D TOUCH CONTROLS */
+#dls-match-viewport {
+    position: relative;
+    width: 100%;
+    height: 78vh;
+    min-height: 480px;
+    background: #0b0f19;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 2px solid #2d4938;
+}
+#dls-canvas-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0; z-index: 10;
+}
+#joystick-zone {
+    position: absolute;
+    bottom: 25px; left: 25px;
+    width: 140px; height: 140px;
+    z-index: 50; touch-action: none;
+}
+.joystick-base {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(4px);
+    position: absolute; top: 5px; left: 5px;
+}
+.joystick-stick {
+    width: 55px; height: 55px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #3b82f6 0%, #1d4ed8 100%);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.8);
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+#action-controls-zone {
+    position: absolute;
+    bottom: 25px; right: 25px;
+    width: 170px; height: 170px;
+    z-index: 50; pointer-events: auto;
+}
+.action-btn {
+    position: absolute;
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-weight: 900; color: white;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    transition: transform 0.08s ease, filter 0.08s ease;
+    touch-action: manipulation;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+.action-btn:active { transform: scale(0.88); filter: brightness(1.25); }
+#btn-c { top: 0; left: 54px; background: radial-gradient(circle, #0284c7 0%, #0369a1 100%); box-shadow: 0 4px 14px rgba(2, 132, 199, 0.6); }
+#btn-b { bottom: 10px; left: 0; background: radial-gradient(circle, #16a34a 0%, #15803d 100%); box-shadow: 0 4px 14px rgba(22, 163, 74, 0.6); }
+#btn-a { bottom: 10px; right: 0; background: radial-gradient(circle, #dc2626 0%, #991b1b 100%); box-shadow: 0 4px 14px rgba(220, 38, 38, 0.6); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">⚽ FOOTBALL <span>MANAGER CARDS DLS</span></div>
+  <div class="pill" aria-label="Saldo de monedas">🪙 <span id="coinsTop">1000</span> <span>monedas</span></div>
+</header>
+
+<div id="gameToast" class="toast" role="status" aria-live="polite"></div>
+
+<main>
+<nav>
+<button class="active" data-tab="club">🏟️ Mi club</button>
+<button data-tab="market">🛒 Fichajes</button>
+<button data-tab="match">⚽ Partido DLS 3D</button>
+<button data-tab="collection">🃏 Cartas</button>
+<button data-tab="casino">🎰 Casino</button>
+</nav>
+
+<!-- VISTA CLUB -->
+<section class="view active" id="club">
+<div class="card reset-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;border-color:#8b7430;background:linear-gradient(100deg,#302b17,#17251b)"><div><h3 style="margin-bottom:4px">🔄 ¿Quieres empezar de nuevo?</h3><p class="small" style="margin:0">Reinicia tu equipo y vuelve a tener 1000 monedas. Tienes hasta 3 usos.</p><p class="small" id="resetClubMessage" style="margin:5px 0 0">Tienes 3 reinicios disponibles.</p></div><button id="resetClubBtn" class="gold" onclick="resetClub()">↻ Reiniciar equipo y monedas (3 usos disponibles)</button></div>
+<div class="hero"><h1>Construye tu club.</h1><p class="sub">Ficha jugadores, mejora tu once y gana partidos 3D. Tu progreso se guarda automáticamente.</p>
+<div class="stats"><div class="stat"><strong id="teamRating">—</strong><span>Valoración del once</span></div><div class="stat"><strong id="wins">0</strong><span>Victorias</span></div><div class="stat"><strong id="played">0</strong><span>Partidos jugados</span></div><div class="stat"><strong>🪙 <span id="clubCoins">1000</span></strong><span>Monedas disponibles</span></div></div></div>
+<div class="layout"><div><div class="section-head"><h2>Tu alineación</h2><select id="formationSelect" onchange="changeFormation(this.value)" style="padding:10px;border-radius:10px;background:#1c3326;color:white;border:1px solid #45634f"><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option><option value="3-5-2">3-5-2</option></select></div><div class="pitch" id="pitch"></div><div id="lineupBench" class="bench-editor"><b>Editar tu once</b><p class="small">Pulsa cualquier jugador del campo para cambiarlo por otro de la misma posición.</p></div></div>
+<div><div class="section-head"><h2>Resumen del club</h2></div><div class="card"><h3>Objetivo de la temporada</h3><p class="sub">Consigue 3 victorias para convertirte en un club destacado.</p><div style="height:9px;background:#0b1710;border-radius:9px;overflow:hidden"><div id="progress" style="height:100%;width:0;background:var(--green)"></div></div><p class="small" id="progressText">0 de 3 victorias</p><button class="gold" onclick="go('match')">Jugar un partido 3D</button></div><div class="notice" id="clubMessage">¡Bienvenido! Tienes 11 jugadores iniciales y 1000 monedas para empezar.</div></div></div>
+</section>
+
+<!-- VISTA MERCADO -->
+<section class="view" id="market">
+<div class="hero"><h1>Mercado de fichajes</h1><p class="sub">Consigue futbolistas reales abriendo sobres de distintas categorías.</p><div class="stats"><div class="stat"><strong id="marketCoins">500</strong><span>Monedas disponibles</span></div><div class="stat"><strong id="ownedCount">5</strong><span>Cartas en tu colección</span></div><div class="stat"><strong id="marketRating">—</strong><span>Media de tu once</span></div></div></div>
+<div class="section-head"><h2>Sobres de jugadores</h2></div><div class="grid pack-grid" id="packGrid"></div><div class="notice" id="packMessage">Cada sobre contiene un jugador aleatorio.</div><div class="section-head"><h2>Jugadores que puedes conseguir</h2><button class="secondary" onclick="refreshMarket()">🔄 Actualizar vista</button></div>
+<div class="actions" style="margin-bottom:12px">
+<select id="leagueFilter" onchange="renderMarket()" style="flex:1;min-width:145px;padding:12px;border-radius:12px;background:#1c3326;color:white;border:1px solid #45634f"><option value="Todas">Todas las ligas</option></select>
+<select id="positionFilter" onchange="renderMarket()" style="flex:1;min-width:125px;padding:12px;border-radius:12px;background:#1c3326;color:white;border:1px solid #45634f"><option value="Todas">Todas las posiciones</option><option value="POR">Porteros</option><option value="DEF">Defensas</option><option value="MED">Centrocampistas</option><option value="DEL">Delanteros</option></select>
+<input id="marketSearch" type="search" oninput="renderMarket()" placeholder="Buscar jugador, club o liga…" style="flex:1;min-width:190px;padding:12px;border-radius:12px;background:#1c3326;color:white;border:1px solid #45634f">
+</div><p id="marketSearchStatus" class="small"></p><div class="grid" id="marketGrid"></div>
+</section>
+
+<!-- VISTA PARTIDO DLS 3D -->
+<section class="view" id="match">
+<div class="hero"><h1>Match Day 3D - DLS Mode</h1><p class="sub">Usa el joystick flotante y los botones arcade (A: Tiro, B: Pase, C: Centro/Cambio). La física 3D responde a tus estrellas reales.</p></div>
+
+<div id="dls-match-viewport">
+  <div id="dls-canvas-container"></div>
+  
+  <!-- Scoreboard Bar -->
+  <div class="absolute top-4 left-4 right-4 z-30 flex justify-between items-center pointer-events-none">
+      <div class="glass-panel px-4 py-2 rounded-xl flex items-center space-x-4 border border-slate-700 bg-slate-900/80 text-white font-bold">
+          <div class="flex items-center space-x-2"><span class="text-amber-400" id="hudHomeName">TU CLUB</span><span id="score-home" class="text-2xl text-white">0</span></div>
+          <span class="text-slate-500">-</span>
+          <div class="flex items-center space-x-2"><span id="score-away" class="text-2xl text-white">0</span><span class="text-blue-400">RIVAL FC</span></div>
+          <div class="w-px h-6 bg-slate-700"></div>
+          <div id="match-timer" class="font-mono text-amber-400">00:00</div>
+      </div>
+      <button onclick="togglePauseDLS()" class="pointer-events-auto bg-slate-800/80 hover:bg-slate-700 text-white w-10 h-10 rounded-xl flex items-center justify-center border border-slate-600">
+          <i class="fa-solid fa-pause"></i>
+      </button>
+  </div>
+
+  <!-- Announcement HUD -->
+  <div id="hud-announcement" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-30 bg-black/80 border border-amber-500 text-amber-400 px-8 py-3 rounded-full text-3xl font-black opacity-0 transition-opacity duration-300 pointer-events-none">
+      ¡GOL!
+  </div>
+
+  <!-- Mobile Touch Overlay Controls -->
+  <div id="match-hud-controls" class="absolute inset-0 z-30 pointer-events-none">
+      <div id="joystick-zone" class="pointer-events-auto">
+          <div class="joystick-base"></div>
+          <div class="joystick-stick" id="joystick-stick"></div>
+      </div>
+      <div id="action-controls-zone">
+          <div id="btn-c" class="action-btn">
+              <span class="text-xl">C</span>
+              <span class="text-[8px] text-sky-200">CENTRO</span>
+          </div>
+          <div id="btn-b" class="action-btn">
+              <span class="text-xl">B</span>
+              <span class="text-[9px] text-emerald-200">PASE</span>
+          </div>
+          <div id="btn-a" class="action-btn">
+              <span class="text-xl">A</span>
+              <span class="text-[9px] text-red-200">TIRO</span>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <div class="actions">
+      <button id="btnStartDLS" class="gold" onclick="startDLSMatch()">▶ Iniciar / Reanudar Partido 3D</button>
+      <button class="secondary" onclick="resetDLSMatch()">↻ Reiniciar Saque</button>
+  </div>
+  <p class="small" style="margin-top:8px">Controles de Teclado: <b>W, A, S, D</b> para moverte, <b>J</b> (Pase), <b>K</b> (Tiro), <b>L / Espacio</b> (Centro/Cambio de jugador).</p>
+</div>
+</section>
+
+<!-- VISTA COLECCIÓN -->
+<section class="view" id="collection">
+<div class="hero"><h1>Mi colección</h1><p class="sub">Tus cartas conseguidas. Gestiona tus futbolistas titulares y vende tus reservas para obtener monedas.</p><div class="stats"><div class="stat"><strong>🪙 <span id="collectionCoins">1000</span></strong><span>Monedas disponibles</span></div><div class="stat"><strong id="collectionCount">0</strong><span>Cartas en tu colección</span></div></div></div><div class="notice" id="sellMessage">Puedes vender jugadores que estén en reserva.</div><div class="grid" id="collectionGrid"></div>
+</section>
+
+<!-- VISTA CASINO -->
+<section class="view" id="casino">
+<div class="hero"><h1>🎰 Casino del club</h1><p class="sub">Minijuegos de azar con monedas ficticias del videojuego.</p><div class="stats"><div class="stat"><strong>🪙 <span id="casinoCoins">1000</span></strong><span>Monedas disponibles</span></div><div class="stat"><strong>5–20</strong><span>Apuesta por tirada</span></div></div></div>
+<div class="casino-grid">
+ <article class="casino-card"><h2>🎰 Tragaperras</h2><p class="small">Tres símbolos iguales pagan x5; dos iguales pagan x2.</p><label for="slotsBet">Apuesta</label><select id="slotsBet"><option value="5">5 monedas</option><option value="10">10 monedas</option><option value="15">15 monedas</option><option value="20">20 monedas</option></select><div class="reels"><span class="reel" id="reel1">⚽</span><span class="reel" id="reel2">⭐</span><span class="reel" id="reel3">🪙</span></div><button class="gold" id="slotsSpinBtn" onclick="casinoSlots()">🎰 Girar</button><div id="slotsResult" class="casino-result">¡Suerte! Elige la apuesta y gira.</div></article>
+ <article class="casino-card"><h2>🔴 Ruleta: Rojo o Negro</h2><p class="small">Elige color. Si aciertas recibes el doble de tu apuesta.</p><label for="colorBet">Apuesta</label><select id="colorBet"><option value="5">5 monedas</option><option value="10">10 monedas</option><option value="15">15 monedas</option><option value="20">20 monedas</option></select><label for="rouletteColor">Elige color</label><select id="rouletteColor"><option value="red">🔴 Rojo</option><option value="black">⚫ Negro</option></select><div class="roulette-stage"><div class="roulette-pointer"></div><div class="roulette-wheel" id="colorWheel"><div class="wheel-numbers" id="colorWheelNumbers"></div><div class="wheel-center"><span>FMC</span></div></div></div><button class="gold" id="colorSpinBtn" onclick="casinoRouletteColor()">🎡 Girar ruleta</button><div id="colorResult" class="casino-result">Elige rojo o negro.</div></article>
+ <article class="casino-card"><h2>🎯 Ruleta: Número Exacto</h2><p class="small">Si sale exactamente tu número (0–36) recibes x36 la apuesta.</p><label for="numberBet">Apuesta</label><select id="numberBet"><option value="5">5 monedas</option><option value="10">10 monedas</option><option value="15">15 monedas</option><option value="20">20 monedas</option></select><label for="rouletteNumber">Número (0–36)</label><input id="rouletteNumber" type="number" min="0" max="36" step="1" value="7"><div class="roulette-stage"><div class="roulette-pointer"></div><div class="roulette-wheel" id="numberWheel"><div class="wheel-numbers" id="numberWheelNumbers"></div><div class="wheel-center"><span>FMC</span></div></div></div><button class="gold" id="numberSpinBtn" onclick="casinoRouletteNumber()">🎯 Apostar al número</button><div id="numberResult" class="casino-result">Elige tu número.</div></article>
+</div>
+</section>
+
+<footer>Football Manager Cards v31 · DLS 3D Soccer Engine Edition</footer>
+</main>
+
+<script>
+/* DATA BASE DE JUGADORES */
+const roster = [
+["Kylian Mbappé","DEL",94,97,38,88,"Real Madrid","LALIGA EA SPORTS","⚡"],
+["Vinícius Júnior","DEL",91,96,35,91,"Real Madrid","LALIGA EA SPORTS","🔥"],
+["Jude Bellingham","MED",91,88,82,90,"Real Madrid","LALIGA EA SPORTS","💎"],
+["Federico Valverde","MED",89,84,86,96,"Real Madrid","LALIGA EA SPORTS","🚀"],
+["Thibaut Courtois","POR",90,12,91,67,"Real Madrid","LALIGA EA SPORTS","🧤"],
+["Lamine Yamal","DEL",91,94,36,88,"FC Barcelona","LALIGA EA SPORTS","⭐"],
+["Pedri","MED",90,83,77,88,"FC Barcelona","LALIGA EA SPORTS","🎯"],
+["Raphinha","DEL",88,91,42,91,"FC Barcelona","LALIGA EA SPORTS","⚡"],
+["Gavi","MED",86,78,82,92,"FC Barcelona","LALIGA EA SPORTS","🔥"],
+["Joan García","POR",84,15,85,72,"FC Barcelona","LALIGA EA SPORTS","🧤"],
+["Antoine Griezmann","DEL",87,88,50,81,"Atlético de Madrid","LALIGA EA SPORTS","🎯"],
+["Julián Álvarez","DEL",89,92,43,89,"Atlético de Madrid","LALIGA EA SPORTS","⚡"],
+["Jan Oblak","POR",89,10,92,70,"Atlético de Madrid","LALIGA EA SPORTS","🧤"],
+["Bukayo Saka","DEL",90,94,48,90,"Arsenal","Premier League","⭐"],
+["Declan Rice","MED",89,78,88,93,"Arsenal","Premier League","🛡️"],
+["William Saliba","DEF",89,42,92,87,"Arsenal","Premier League","🛡️"],
+["David Raya","POR",87,12,88,74,"Arsenal","Premier League","🧤"],
+["Erling Haaland","DEL",93,98,35,86,"Manchester City","Premier League","🔥"],
+["Phil Foden","MED",89,91,58,88,"Manchester City","Premier League","💎"],
+["Rodri","MED",91,76,93,85,"Manchester City","Premier League","🛡️"],
+["Virgil van Dijk","DEF",89,58,94,82,"Liverpool","Premier League","🛡️"],
+["Mohamed Salah","DEL",91,96,44,86,"Liverpool","Premier League","⚡"],
+["Alisson Becker","POR",89,12,91,74,"Liverpool","Premier League","🧤"],
+["Florian Wirtz","MED",90,90,67,87,"Liverpool","Premier League","🎯"],
+["Bruno Fernandes","MED",88,88,65,91,"Manchester United","Premier League","🎯"],
+["Cole Palmer","MED",89,91,45,83,"Chelsea","Premier League","⭐"],
+["Nicolò Barella","MED",89,82,86,94,"Inter","Serie A","🚀"],
+["Lautaro Martínez","DEL",90,94,48,89,"Inter","Serie A","🔥"],
+["Alessandro Bastoni","DEF",88,55,91,84,"Inter","Serie A","🛡️"],
+["Mike Maignan","POR",88,12,89,76,"AC Milan","Serie A","🧤"],
+["Rafael Leão","DEL",89,94,39,88,"AC Milan","Serie A","⚡"],
+["Christian Pulisic","DEL",86,88,48,86,"AC Milan","Serie A","⭐"],
+["Kenan Yıldız","DEL",87,90,42,86,"Juventus","Serie A","💎"],
+["Dušan Vlahović","DEL",86,91,34,79,"Juventus","Serie A","🔥"],
+["Gleison Bremer","DEF",87,46,92,81,"Juventus","Serie A","🛡️"],
+["Scott McTominay","MED",87,86,78,88,"Napoli","Serie A","🚀"],
+["Harry Kane","DEL",93,96,45,83,"Bayern München","Bundesliga","🔥"],
+["Jamal Musiala","MED",91,93,54,89,"Bayern München","Bundesliga","💎"],
+["Michael Olise","DEL",89,92,42,88,"Bayern München","Bundesliga","⭐"],
+["Manuel Neuer","POR",87,10,89,62,"Bayern München","Bundesliga","🧤"],
+["Joshua Kimmich","MED",89,77,88,90,"Bayern München","Bundesliga","🎯"]
+];
+
+const extraRoster = [
+["Lionel Messi","DEL",92,94,38,72,"Inter Miami","MLS","🐐","icon"],
+["Cristiano Ronaldo","DEL",91,95,35,75,"Al Nassr","Saudi Pro League","🐐","icon"],
+["Neymar Jr","DEL",89,92,35,70,"Santos","Brasileirão","✨","hero"],
+["Zlatan Ibrahimović","DEL",90,93,42,66,"Leyenda","Iconos","🦁","icon"],
+["Ronaldinho","MED",91,91,42,78,"Leyenda","Iconos","✨","icon"],
+["Ronaldo Nazário","DEL",94,97,38,86,"Leyenda","Iconos","⚡","icon"],
+["Pelé","DEL",96,98,45,88,"Leyenda","Iconos","👑","icon"],
+["Diego Maradona","MED",95,94,42,84,"Leyenda","Iconos","🎩","icon"],
+["Zinedine Zidane","MED",94,91,76,82,"Leyenda","Iconos","🎩","icon"]
+];
+roster.push(...extraRoster);
+
+let state;
+function makePlayer(row,i){const [name,pos,rating,atk,def,stam,club,league,emoji,cardStyle]=row;return {id:i+1,name,pos,rating,atk,def,stam,club,league,emoji,cardStyle:cardStyle|| (rating>=90?"elite":rating>=80?"gold":rating>=70?"silver":"bronze"),price:Math.max(80,(rating-48)*18),owned:false}}
+const allPlayers=roster.map(makePlayer);
+
+function pickRandom(list,n){const pool=list.slice();for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}return pool.slice(0,n)}
+function starterPool(players,pos,n){let pool=players.filter(p=>p.pos===pos&&!p.owned&&p.rating<=70);if(pool.length<n)pool=pool.concat(players.filter(p=>p.pos===pos&&!p.owned&&p.rating>70));return pickRandom(pool,n);}
+
+function giveMinimumTeam(s){
+ s.formation=["4-3-3","4-4-2","3-5-2"].includes(s.formation)?s.formation:"4-3-3";
+ const shape={"4-3-3":[4,3,3],"4-4-2":[4,4,2],"3-5-2":[3,5,2]}[s.formation]||[4,3,3];
+ const roles=["POR",...Array(shape[0]).fill("DEF"),...Array(shape[1]).fill("MED"),...Array(shape[2]).fill("DEL")];
+ const valid=s.lineup&&s.lineup.length===11&&s.lineup.every((id,i)=>{const p=s.players.find(x=>x.id===id);return p&&p.owned&&p.pos===roles[i]})&&new Set(s.lineup).size===11;
+ if(valid)return s;
+ s.lineup=Array(11).fill(null);
+ const chosen=[];
+ for(const pos of ["POR","DEF","MED","DEL"]){const count=roles.filter(r=>r===pos).length;const existing=s.players.filter(p=>p.owned&&p.pos===pos);const need=Math.max(0,count-existing.length);const extras=starterPool(s.players,pos,need);extras.forEach(p=>{p.owned=true;p.rating=Math.min(70,p.rating);p.price=Math.max(80,(p.rating-48)*18)});chosen.push(...existing,...extras)}
+ const byPos={POR:[],DEF:[],MED:[],DEL:[]};chosen.forEach(p=>{if(byPos[p.pos])byPos[p.pos].push(p)});
+ roles.forEach((pos,i)=>{const p=byPos[pos].shift();if(p){p.rating=Math.min(70,p.rating);s.lineup[i]=p.id}});
+ return s;
+}
+
+function freshState(){
+ const players=allPlayers.map(p=>({...p,owned:false}));
+ const state0={coins:1000,wins:0,played:0,resetUses:0,players,market:[],lineup:Array(11).fill(null),formation:"4-3-3"};
+ return giveMinimumTeam(state0);
+}
+
+function load(){
+ try{
+  const raw=localStorage.getItem("fmc-save-v2");
+  if(raw){const s=JSON.parse(raw);if(s&&Array.isArray(s.players)){giveMinimumTeam(s);return s;}}
+ }catch(e){}
+ const s=freshState();localStorage.setItem("fmc-save-v2",JSON.stringify(s));return s;
+}
+
+state=load();
+let editingSlot=null;
+
+function save(){try{localStorage.setItem("fmc-save-v2",JSON.stringify(state))}catch(e){}render()}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+
+function go(tab){
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+ document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===tab));
+ if(tab==='match'){ if(!dlsEngine.initialized) initDLSEngine(); onWindowResizeDLS(); }
+}
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+
+function getPlayer(id){return state.players.find(p=>p.id===id)}
+function aligned(){return state.lineup.map(getPlayer).filter(Boolean)}
+function rating(){const a=aligned();return a.length?Math.round(a.reduce((s,p)=>s+p.rating,0)/a.length):0}
+
+function cardHTML(p,market=false,sellable=false){
+ const style=p.cardStyle||(p.rating>=90?"elite":p.rating>=80?"gold":p.rating>=70?"silver":"bronze");
+ const isStarter=state.lineup.includes(p.id);
+ return `<article class="card player-card simple-player style-${style}">
+   <div class="simple-rating">${p.rating}</div>
+   <div class="simple-player-name">${p.name}</div>
+   <div class="simple-player-detail"><span class="simple-pos">${p.pos}</span><span>${p.emoji||'⚽'}</span></div>
+   <div class="simple-player-team"><span class="team-label">EQUIPO</span><b>${p.club}</b></div>
+   ${market?`<div class="price">🪙 ${p.price}</div>`:sellable?`<div class="simple-player-actions"><button class="secondary" onclick="alignPlayer(${p.id})" ${isStarter?"disabled":""}>${isStarter?"Titular":"Alinear"}</button><button class="gold" onclick="sellPlayer(${p.id})" ${isStarter||state.players.filter(x=>x.owned).length<=11?"disabled":""}>Vender</button></div>`:`<button class="secondary" onclick="alignPlayer(${p.id})">Alinear</button>`}
+ </article>`
+}
+
+function alignPlayer(id){const p=getPlayer(id);if(!p||!p.owned)return;const idx=state.lineup.findIndex((x,i)=>x===null&&slotRole(i)===p.pos);if(idx<0)return;state.lineup[idx]=id;save();}
+function sellPlayer(id){const p=getPlayer(id);if(!p||!p.owned||state.lineup.includes(id))return;p.owned=false;state.coins+=Math.round(p.price*0.7);save();}
+function resetClub(){if(window.confirm("¿Reiniciar tu club a 1000 monedas?")){state=freshState();save();render();}}
+
+const FORMATIONS={"4-3-3":{def:4,mid:3,fw:3},"4-4-2":{def:4,mid:4,fw:2},"3-5-2":{def:3,mid:5,fw:2}};
+function slotRole(idx){if(idx===0)return "POR";const f=FORMATIONS[state.formation]||FORMATIONS["4-3-3"];if(idx<=f.def)return "DEF";if(idx<=f.def+f.mid)return "MED";return "DEL"}
+function changeFormation(val){state.formation=val;state=giveMinimumTeam(state);save();}
+
+function renderPitch(){
+ const pitch=document.getElementById("pitch");const f=FORMATIONS[state.formation]||FORMATIONS["4-3-3"];
+ const rows=[[0],Array.from({length:f.def},(_,i)=>1+i),Array.from({length:f.mid},(_,i)=>1+f.def+i),Array.from({length:f.fw},(_,i)=>1+f.def+f.mid+i)];
+ pitch.innerHTML=rows.map(row=>`<div class="line">${row.map(slot=>{const id=state.lineup[slot];const p=id?getPlayer(id):null;const role=slotRole(slot);if(!p)return `<button class="lineup-card empty"><span class="lineup-pos">${role}</span></button>`;return `<button class="lineup-card style-${p.cardStyle||'gold'}"><span class="lineup-rating">${p.rating}</span><span class="lineup-name">${p.name}</span><span class="lineup-pos">${p.pos}</span></button>`}).join("")}</div>`).join("");
+}
+
+function renderMarket(){
+ const packs=[["bronce","📦 Sobre bronce",100],["plata","🥈 Sobre plata",250],["oro","🥇 Sobre oro",500],["leyenda","✨ Sobre Leyendas",10000]];
+ document.getElementById("packGrid").innerHTML=packs.map(([id,title,cost])=>`<article class="card"><div class="avatar">🎴</div><h3>${title}</h3><div class="price">🪙 ${cost}</div><button onclick="openPack('${id}')" ${state.coins<cost?"disabled":""}>Abrir sobre</button></article>`).join("");
+ const list=state.players.filter(p=>!p.owned).slice(0,12);
+ document.getElementById("marketGrid").innerHTML=list.map(p=>cardHTML(p,true)).join("");
+}
+
+function openPack(kind){
+ const costs={bronce:100,plata:250,oro:500,leyenda:10000};
+ const cost=costs[kind];if(state.coins<cost)return;
+ state.coins-=cost;
+ const pool=state.players.filter(p=>!p.owned);
+ if(pool.length){const won=pool[rand(0,pool.length-1)];won.owned=true;alert(`¡Has conseguido a ${won.name} (${won.rating})!`);}
+ save();
+}
+
+function render(){
+ document.getElementById("coinsTop").textContent=state.coins;
+ document.getElementById("clubCoins").textContent=state.coins;
+ document.getElementById("marketCoins").textContent=state.coins;
+ document.getElementById("collectionCoins").textContent=state.coins;
+ document.getElementById("casinoCoins").textContent=state.coins;
+ document.getElementById("teamRating").textContent=rating();
+ document.getElementById("wins").textContent=state.wins;
+ document.getElementById("played").textContent=state.played;
+ renderPitch();renderMarket();
+ document.getElementById("collectionGrid").innerHTML=state.players.filter(p=>p.owned).map(p=>cardHTML(p,false,true)).join("");
+}
+
+/* AUDIO ENGINE DLS WEB AUDIO SYNTH */
+const AudioEngine = {
+    ctx: null,
+    init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+    playWhistle() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'sine'; osc.frequency.setValueAtTime(2500, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1800, this.ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.3);
+    },
+    playKick() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, this.ctx.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.5, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+    },
+    playSave() {
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.4, this.ctx.currentTime); gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain); gain.connect(this.ctx.destination); osc.start(); osc.stop(this.ctx.currentTime + 0.15);
+    },
+    playCheer() {
+        if (!this.ctx) return;
+        const bufferSize = this.ctx.sampleRate * 1.5; const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0); for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = this.ctx.createBufferSource(); noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 1000; filter.Q.value = 3;
+        const gain = this.ctx.createGain(); gain.gain.setValueAtTime(0.01, this.ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.3); gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 1.5);
+        noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination); noise.start();
+    }
+};
+
+/* MOTOR DE JUEGO DLS 3D CON THREE.JS */
+const PITCH_WIDTH = 60, PITCH_LENGTH = 90, GOAL_WIDTH = 8, GOAL_HEIGHT = 4;
+const GRAVITY = 20.0, GRASS_FRICTION = 0.982, AIR_DRAG = 0.994, BALL_RESTITUTION = 0.55;
+
+let dlsEngine = {
+    initialized: false, running: false, isPaused: false,
+    scene: null, camera: null, renderer: null, ballMesh: null, selectionMarker: null,
+    homeTeam: [], awayTeam: [], controlledIndex: 9,
+    scoreHome: 0, scoreAway: 0, matchTime: 0, timerInterval: null,
+    playerControls: { x: 0, z: 0 },
+    clock: new THREE.Clock()
+};
+
+const homeFormations11 = [
+    { x: 0, z: 41 }, { x: -18, z: 28 }, { x: -6, z: 32 }, { x: 6, z: 32 }, { x: 18, z: 28 },
+    { x: -10, z: 16 }, { x: 0, z: 18 }, { x: 10, z: 16 }, { x: -18, z: 4 }, { x: 0, z: 2 }, { x: 18, z: 4 }
+];
+const awayFormations11 = [
+    { x: 0, z: -41 }, { x: 18, z: -28 }, { x: 6, z: -32 }, { x: -6, z: -32 }, { x: -18, z: -28 },
+    { x: 10, z: -16 }, { x: 0, z: -18 }, { x: -10, z: -16 }, { x: 18, z: -4 }, { x: 0, z: -2 }, { x: -18, z: -4 }
+];
+
+function initDLSEngine() {
+    const container = document.getElementById('dls-canvas-container');
+    dlsEngine.scene = new THREE.Scene();
+    dlsEngine.scene.background = new THREE.Color(0x0f172a);
+    dlsEngine.scene.fog = new THREE.Fog(0x0f172a, 40, 120);
+
+    dlsEngine.camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    dlsEngine.camera.position.set(0, 35, 45);
+    dlsEngine.camera.lookAt(0, 0, 0);
+
+    dlsEngine.renderer = new THREE.WebGLRenderer({ antialias: true });
+    dlsEngine.renderer.setSize(container.clientWidth, container.clientHeight);
+    dlsEngine.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    dlsEngine.renderer.shadowMap.enabled = true;
+    container.appendChild(dlsEngine.renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    dlsEngine.scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(30, 50, 20);
+    dirLight.castShadow = true;
+    dlsEngine.scene.add(dirLight);
+
+    buildDLSPitch();
+    buildDLSBall();
+    buildDLSSelectionMarker();
+    buildDLSTeams();
+    setupDLSControls();
+
+    window.addEventListener('resize', onWindowResizeDLS);
+    dlsEngine.initialized = true;
+    animateDLS();
+}
+
+function buildDLSPitch() {
+    const fieldGeo = new THREE.PlaneGeometry(PITCH_WIDTH, PITCH_LENGTH);
+    const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+    for (let i = 0; i < 12; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#2e7d32' : '#388e3c';
+        ctx.fillRect(0, i * (1024/12), 512, 1024/12);
+    }
+    ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 6;
+    ctx.strokeRect(15, 15, 482, 994);
+    ctx.beginPath(); ctx.moveTo(15, 512); ctx.lineTo(497, 512); ctx.arc(256, 512, 70, 0, Math.PI * 2); ctx.stroke();
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    const pitch = new THREE.Mesh(fieldGeo, new THREE.MeshStandardMaterial({ map: texture, roughness: 0.8 }));
+    pitch.rotation.x = -Math.PI / 2; pitch.receiveShadow = true;
+    dlsEngine.scene.add(pitch);
+
+    buildDLSGoal(PITCH_LENGTH / 2); buildDLSGoal(-PITCH_LENGTH / 2);
+}
+
+function buildDLSGoal(zPos) {
+    const goalGroup = new THREE.Group();
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const postGeo = new THREE.CylinderGeometry(0.15, 0.15, GOAL_HEIGHT);
+    const leftPost = new THREE.Mesh(postGeo, mat); leftPost.position.set(-GOAL_WIDTH / 2, GOAL_HEIGHT / 2, 0);
+    const rightPost = new THREE.Mesh(postGeo, mat); rightPost.position.set(GOAL_WIDTH / 2, GOAL_HEIGHT / 2, 0);
+    const barGeo = new THREE.CylinderGeometry(0.15, 0.15, GOAL_WIDTH);
+    const bar = new THREE.Mesh(barGeo, mat); bar.rotation.z = Math.PI / 2; bar.position.set(0, GOAL_HEIGHT, 0);
+    goalGroup.add(leftPost, rightPost, bar); goalGroup.position.z = zPos;
+    dlsEngine.scene.add(goalGroup);
+}
+
+function buildDLSBall() {
+    const ballGeo = new THREE.SphereGeometry(0.4, 16, 16);
+    dlsEngine.ballMesh = new THREE.Mesh(ballGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }));
+    dlsEngine.ballMesh.castShadow = true;
+    dlsEngine.ballMesh.position.set(0, 0.4, 0);
+    dlsEngine.ballMesh.userData = { velocity: new THREE.Vector3() };
+    dlsEngine.scene.add(dlsEngine.ballMesh);
+}
+
+function buildDLSSelectionMarker() {
+    const group = new THREE.Group();
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.7, 4), new THREE.MeshBasicMaterial({ color: 0xf59e0b }));
+    cone.rotation.x = Math.PI; cone.position.y = 3.2;
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 16), new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide }));
+    ring.rotation.x = Math.PI / 2; ring.position.y = 0.05;
+    group.add(cone, ring); dlsEngine.selectionMarker = group;
+    dlsEngine.scene.add(dlsEngine.selectionMarker);
+}
+
+function createDLSPlayerMesh(colorHex, isGK = false) {
+    const group = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.3, 1.4, 8), new THREE.MeshStandardMaterial({ color: isGK ? 0xf59e0b : colorHex }));
+    body.position.y = 1.1; body.castShadow = true;
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshStandardMaterial({ color: 0xffdbac }));
+    head.position.y = 2.1;
+    group.add(body, head);
+    return group;
+}
+
+function buildDLSTeams() {
+    dlsEngine.homeTeam = []; dlsEngine.awayTeam = [];
+    for (let i = 0; i < 11; i++) {
+        const isGK = (i === 0);
+        const p = createDLSPlayerMesh(0x36d17c, isGK); dlsEngine.scene.add(p);
+        dlsEngine.homeTeam.push({ mesh: p, isGK, basePos: homeFormations11[i], velocity: new THREE.Vector3(), dribbleTimer: 0 });
+    }
+    for (let i = 0; i < 11; i++) {
+        const isGK = (i === 0);
+        const p = createDLSPlayerMesh(0x2563eb, isGK); dlsEngine.scene.add(p);
+        dlsEngine.awayTeam.push({ mesh: p, isGK, basePos: awayFormations11[i], velocity: new THREE.Vector3() });
+    }
+    resetDLSPositions();
+}
+
+function resetDLSPositions() {
+    dlsEngine.homeTeam.forEach((p, idx) => { p.mesh.position.set(homeFormations11[idx].x, 0, homeFormations11[idx].z); p.velocity.set(0, 0, 0); });
+    dlsEngine.awayTeam.forEach((p, idx) => { p.mesh.position.set(awayFormations11[idx].x, 0, awayFormations11[idx].z); p.mesh.rotation.y = Math.PI; p.velocity.set(0, 0, 0); });
+    dlsEngine.controlledIndex = 9;
+    dlsEngine.ballMesh.position.set(0, 0.4, 0); dlsEngine.ballMesh.userData.velocity.set(0, 0, 0);
+}
+
+function setupDLSControls() {
+    const zone = document.getElementById('joystick-zone'), stick = document.getElementById('joystick-stick');
+    let active = false, touchId = null, center = { x: 0, y: 0 };
+
+    zone.addEventListener('touchstart', (e) => {
+        const t = e.changedTouches[0]; active = true; touchId = t.identifier;
+        const rect = zone.getBoundingClientRect(); center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        updateJoy(t.clientX, t.clientY);
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (!active) return;
+        for (let t of e.changedTouches) if (t.identifier === touchId) updateJoy(t.clientX, t.clientY);
+    });
+    const endJoy = (e) => {
+        if (!active) return;
+        for (let t of e.changedTouches) if (t.identifier === touchId) {
+            active = false; stick.style.transform = `translate(-50%, -50%)`;
+            dlsEngine.playerControls.x = 0; dlsEngine.playerControls.z = 0;
+        }
+    };
+    window.addEventListener('touchend', endJoy); window.addEventListener('touchcancel', endJoy);
+
+    function updateJoy(cx, cy) {
+        const dx = cx - center.x, dy = cy - center.y, dist = Math.hypot(dx, dy), maxD = 45;
+        const angle = Math.atan2(dy, dx), limited = Math.min(dist, maxD);
+        const mx = Math.cos(angle) * limited, my = Math.sin(angle) * limited;
+        stick.style.transform = `translate(calc(-50% + ${mx}px), calc(-50% + ${my}px))`;
+        dlsEngine.playerControls.x = mx / maxD; dlsEngine.playerControls.z = my / maxD;
+    }
+
+    const bind = (id, fn) => {
+        const el = document.getElementById(id);
+        el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); });
+        el.addEventListener('mousedown', () => fn());
+    };
+    bind('btn-a', () => performKickDLS(26, 4.5));
+    bind('btn-b', () => performKickDLS(15, 0.2));
+    bind('btn-c', () => switchOrLobDLS());
+
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'w' || e.key === 'ArrowUp') dlsEngine.playerControls.z = -1;
+        if (e.key === 's' || e.key === 'ArrowDown') dlsEngine.playerControls.z = 1;
+        if (e.key === 'a' || e.key === 'ArrowLeft') dlsEngine.playerControls.x = -1;
+        if (e.key === 'd' || e.key === 'ArrowRight') dlsEngine.playerControls.x = 1;
+        if (e.key === 'j') performKickDLS(15, 0.2);
+        if (e.key === 'k') performKickDLS(26, 4.5);
+        if (e.key === 'l' || e.key === ' ') switchOrLobDLS();
+    });
+    window.addEventListener('keyup', (e) => {
+        if (['w', 's', 'ArrowUp', 'ArrowDown'].includes(e.key)) dlsEngine.playerControls.z = 0;
+        if (['a', 'd', 'ArrowLeft', 'ArrowRight'].includes(e.key)) dlsEngine.playerControls.x = 0;
+    });
+}
+
+function switchOrLobDLS() {
+    if (!dlsEngine.running || dlsEngine.isPaused) return;
+    const active = dlsEngine.homeTeam[dlsEngine.controlledIndex].mesh;
+    if (active.position.distanceTo(dlsEngine.ballMesh.position) < 2.5) performKickDLS(18, 11);
+    else {
+        let best = dlsEngine.controlledIndex, minDist = Infinity;
+        for (let i = 1; i < 11; i++) {
+            if (i === dlsEngine.controlledIndex) continue;
+            const d = dlsEngine.homeTeam[i].mesh.position.distanceTo(dlsEngine.ballMesh.position);
+            if (d < minDist) { minDist = d; best = i; }
+        }
+        dlsEngine.controlledIndex = best;
+    }
+}
+
+function performKickDLS(power, lift) {
+    if (!dlsEngine.running || dlsEngine.isPaused) return;
+    const active = dlsEngine.homeTeam[dlsEngine.controlledIndex].mesh;
+    if (active.position.distanceTo(dlsEngine.ballMesh.position) < 2.5) {
+        AudioEngine.playKick();
+        const fwd = new THREE.Vector3(0, 0, -1);
+        if (Math.abs(dlsEngine.playerControls.x) > 0.1 || Math.abs(dlsEngine.playerControls.z) > 0.1) {
+            fwd.set(dlsEngine.playerControls.x, 0, dlsEngine.playerControls.z).normalize();
+        } else fwd.applyQuaternion(active.quaternion);
+        dlsEngine.ballMesh.userData.velocity.set(fwd.x * power, lift, fwd.z * power);
+    }
+}
+
+function updatePhysicsDLS(delta) {
+    if (!dlsEngine.running || dlsEngine.isPaused) return;
+
+    const activeObj = dlsEngine.homeTeam[dlsEngine.controlledIndex];
+    const active = activeObj.mesh;
+    const tx = dlsEngine.playerControls.x * 14, tz = dlsEngine.playerControls.z * 14;
+
+    activeObj.velocity.x = THREE.MathUtils.lerp(activeObj.velocity.x, tx, 10 * delta);
+    activeObj.velocity.z = THREE.MathUtils.lerp(activeObj.velocity.z, tz, 10 * delta);
+    active.position.x += activeObj.velocity.x * delta; active.position.z += activeObj.velocity.z * delta;
+
+    if (activeObj.velocity.lengthSq() > 0.1) {
+        active.rotation.y = THREE.MathUtils.lerp(active.rotation.y, Math.atan2(activeObj.velocity.x, activeObj.velocity.z), 12 * delta);
+    }
+
+    dlsEngine.selectionMarker.position.set(active.position.x, 0, active.position.z);
+
+    const ball = dlsEngine.ballMesh, vel = ball.userData.velocity;
+    if (active.position.distanceTo(ball.position) < 1.4 && ball.position.y < 1.0) {
+        activeObj.dribbleTimer += delta;
+        if (activeObj.dribbleTimer > 0.2) {
+            activeObj.dribbleTimer = 0;
+            const dir = new THREE.Vector3(0, 0, 1).applyAxisAngle(new THREE.Vector3(0, 1, 0), active.rotation.y);
+            vel.x = dir.x * 7.5; vel.z = dir.z * 7.5; vel.y = 0.4;
+        }
+    }
+
+    ball.position.x += vel.x * delta; ball.position.y += vel.y * delta; ball.position.z += vel.z * delta;
+    if (ball.position.y > 0.4) { vel.y -= GRAVITY * delta; vel.x *= AIR_DRAG; vel.z *= AIR_DRAG; }
+    else { ball.position.y = 0.4; vel.y = Math.abs(vel.y) > 1.0 ? -vel.y * BALL_RESTITUTION : 0; vel.x *= GRASS_FRICTION; vel.z *= GRASS_FRICTION; }
+
+    if (Math.abs(ball.position.z) > PITCH_LENGTH / 2) {
+        if (Math.abs(ball.position.x) < GOAL_WIDTH / 2 && ball.position.y < GOAL_HEIGHT) {
+            triggerGoalDLS(ball.position.z < 0 ? 'TU CLUB' : 'RIVAL FC');
+        } else {
+            ball.position.z = Math.sign(ball.position.z) * (PITCH_LENGTH / 2);
+            vel.z = -vel.z * BALL_RESTITUTION;
+        }
+    }
+
+    // AI Rivales
+    dlsEngine.awayTeam.forEach((p, i) => {
+        if (p.isGK) return;
+        const dist = p.mesh.position.distanceTo(ball.position);
+        if (dist < 18) {
+            const dir = new THREE.Vector3().subVectors(ball.position, p.mesh.position).normalize();
+            p.mesh.position.x += dir.x * 7 * delta; p.mesh.position.z += dir.z * 7 * delta;
+            p.mesh.rotation.y = Math.atan2(dir.x, dir.z);
+            if (dist < 1.5) { AudioEngine.playKick(); vel.set((Math.random() - 0.5) * 8, 3, 16); }
+        }
+    });
+
+    dlsEngine.camera.position.x = THREE.MathUtils.lerp(dlsEngine.camera.position.x, active.position.x * 0.5, 5 * delta);
+    dlsEngine.camera.position.z = THREE.MathUtils.lerp(dlsEngine.camera.position.z, active.position.z + 25, 5 * delta);
+    dlsEngine.camera.lookAt(active.position.x, 0, active.position.z - 5);
+}
+
+function triggerGoalDLS(team) {
+    dlsEngine.isPaused = true;
+    AudioEngine.playWhistle(); AudioEngine.playCheer();
+    if (team === 'TU CLUB') { dlsEngine.scoreHome++; state.wins++; } else dlsEngine.scoreAway++;
+    document.getElementById('score-home').innerText = dlsEngine.scoreHome;
+    document.getElementById('score-away').innerText = dlsEngine.scoreAway;
+    
+    const ann = document.getElementById('hud-announcement');
+    ann.innerText = `¡GOL DE ${team}!`; ann.classList.remove('opacity-0');
+    setTimeout(() => {
+        ann.classList.add('opacity-0');
+        resetDLSPositions();
+        dlsEngine.isPaused = false;
+        save();
+    }, 2500);
+}
+
+function startDLSMatch() {
+    AudioEngine.init(); AudioEngine.playWhistle();
+    if (!dlsEngine.initialized) initDLSEngine();
+    dlsEngine.running = true; dlsEngine.isPaused = false;
+    if (!dlsEngine.timerInterval) {
+        dlsEngine.timerInterval = setInterval(() => {
+            if (dlsEngine.running && !dlsEngine.isPaused) {
+                dlsEngine.matchTime++;
+                const m = String(Math.floor(dlsEngine.matchTime / 60)).padStart(2, '0');
+                const s = String(dlsEngine.matchTime % 60).padStart(2, '0');
+                document.getElementById('match-timer').innerText = `${m}:${s}`;
+            }
+        }, 1000);
+    }
+}
+
+function togglePauseDLS() { dlsEngine.isPaused = !dlsEngine.isPaused; }
+function resetDLSMatch() { resetDLSPositions(); }
+
+function onWindowResizeDLS() {
+    const container = document.getElementById('dls-canvas-container');
+    if (!container || !dlsEngine.renderer) return;
+    dlsEngine.camera.aspect = container.clientWidth / container.clientHeight;
+    dlsEngine.camera.updateProjectionMatrix();
+    dlsEngine.renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+function animateDLS() {
+    requestAnimationFrame(animateDLS);
+    const delta = dlsEngine.clock.getDelta();
+    updatePhysicsDLS(delta);
+    if (dlsEngine.renderer) dlsEngine.renderer.render(dlsEngine.scene, dlsEngine.camera);
+}
+
+/* CASINO ENGINE LOGIC */
+function casinoSlots(){
+ const bet=Number(document.getElementById("slotsBet").value);if(state.coins<bet)return;
+ state.coins-=bet;const syms=["⚽","⭐","🪙","🏆","🔥","💎"];
+ const reels=[syms[rand(0,5)],syms[rand(0,5)],syms[rand(0,5)]];
+ document.getElementById("reel1").textContent=reels[0];
+ document.getElementById("reel2").textContent=reels[1];
+ document.getElementById("reel3").textContent=reels[2];
+ let win=0;if(reels[0]===reels[1]&&reels[1]===reels[2])win=bet*5;
+ else if(reels[0]===reels[1]||reels[1]===reels[2]||reels[0]===reels[2])win=bet*2;
+ state.coins+=win;
+ document.getElementById("slotsResult").textContent=win?`¡Has ganado ${win} monedas!`:`Sin premio. Pierdes ${bet} monedas.`;
+ save();
+}
+
+function casinoRouletteColor(){
+ const bet=Number(document.getElementById("colorBet").value);if(state.coins<bet)return;
+ state.coins-=bet;const n=rand(0,36);const col=n===0?"green":[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(n)?"red":"black";
+ const pick=document.getElementById("rouletteColor").value;
+ const win=col===pick?bet*2:0;state.coins+=win;
+ document.getElementById("colorResult").textContent=`Salió ${n} (${col}). ${win?`¡Ganaste ${win} monedas!`:''}`;
+ save();
+}
+
+function casinoRouletteNumber(){
+ const bet=Number(document.getElementById("numberBet").value);if(state.coins<bet)return;
+ state.coins-=bet;const n=rand(0,36);const pick=Number(document.getElementById("rouletteNumber").value);
+ const win=n===pick?bet*36:0;state.coins+=win;
+ document.getElementById("numberResult").textContent=`Salió el ${n}. ${win?`¡Premio exacto de ${win} monedas!`:''}`;
+ save();
+}
+
+render();
+</script>
+</body>
+</html>
