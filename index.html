@@ -324,7 +324,6 @@ function showPackOpening(p,duplicate,value){
  document.body.appendChild(overlay);const stage=overlay.querySelector("#openingStage"),footer=overlay.querySelector("#openingFooter"),title=overlay.querySelector(".pack-opening-title");
  const country=countryForPlayer(p);const steps=[
   ()=>{title.textContent="¡HA SALIDO UN JUGADOR!";stage.innerHTML='<div class="pack-opening-reveal notranslate" translate="no" style="color:#ffd166">'+escapeHTML(displayPositionCode(p.pos))+'</div><div class="pack-opening-sub">Posición</div>';},
-  ()=>{title.textContent="¿DE DÓNDE VIENE?";stage.innerHTML='<div class="pack-opening-reveal" style="color:#8de8ff">'+country[0]+' '+escapeHTML(country[1])+'</div><div class="pack-opening-sub">Nacionalidad</div>';},
   ()=>{title.textContent="SU EQUIPO";stage.innerHTML='<div class="pack-opening-reveal" style="color:#9dffb8">'+escapeHTML(p.club)+'</div><div class="pack-opening-sub">Club</div>';},
   ()=>{title.textContent=duplicate?"¡CARTA REPETIDA!":"¡TU NUEVA CARTA!";stage.innerHTML='<div class="pack-opening-card">'+cardHTML(p,false,false)+'</div>';footer.textContent=duplicate?'Se ha vendido automáticamente por '+value+' monedas.':'La carta ya está en tu colección.';const av=stage.querySelector(".avatar");if(av)loadCardPhoto(av);
   setTimeout(()=>{overlay.classList.add("closing");setTimeout(()=>overlay.remove(),400)},2200);
