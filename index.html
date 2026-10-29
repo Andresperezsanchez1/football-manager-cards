@@ -10,27 +10,8 @@
 <body>
 <header>
 <div class="brand">⚽ FOOTBALL <span>MANAGER CARDS</span></div>
-<div style="display:flex; gap:10px; align-items:center;">
-<button id="authBtnHeader" class="small" style="background:#22c55e; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="openAuthModal()">👤 Iniciar Sesión</button>
 <div class="pill" aria-label="Saldo de monedas">🪙 <span id="coinsTop">1000</span> <span>monedas</span></div>
-</div>
 </header>
-
-<!-- Modal de Autenticación -->
-<div id="authModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
-  <div style="background:#17251b; border:1px solid #8b7430; padding:24px; border-radius:12px; max-width:360px; width:90%; color:#fff; text-align:center;">
-    <h3 id="authTitle" style="margin-top:0;">👤 Inicio de Sesión</h3>
-    <p style="font-size:0.85rem; color:#aaa;">Inicia sesión para guardar tu progreso, plantilla y monedas en este dispositivo.</p>
-    <input type="text" id="authUsername" placeholder="Nombre de usuario" style="width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff; box-sizing:border-box;">
-    <input type="password" id="authPassword" placeholder="Contraseña" style="width:100%; padding:10px; margin:8px 0; border-radius:6px; border:1px solid #334155; background:#0f172a; color:#fff; box-sizing:border-box;">
-    <div style="display:flex; gap:8px; margin-top:12px;">
-      <button onclick="submitAuth('login')" style="flex:1; background:#22c55e; color:#fff; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Entrar</button>
-      <button onclick="submitAuth('register')" style="flex:1; background:#3b82f6; color:#fff; padding:10px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Registrar</button>
-    </div>
-    <button onclick="closeAuthModal()" style="background:transparent; border:none; color:#888; margin-top:12px; cursor:pointer; text-decoration:underline;">Cancelar</button>
-  </div>
-</div>
-
 <div id="gameToast" class="toast" role="status" aria-live="polite"></div><main>
 <nav>
 <button class="active" data-tab="club">🏟️ Mi club</button>
@@ -42,39 +23,55 @@
 <button data-tab="futchapas">🟢 FutChapas</button>
 <button data-tab="casino">🎰 Casino</button>
 </nav>
+
 <section class="view active" id="club">
 <div class="card reset-topbar" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;border-color:#8b7430;background:linear-gradient(100deg,#302b17,#17251b)"><div><h3 style="margin-bottom:4px">🔄 ¿Quieres empezar de nuevo?</h3><p class="small" style="margin:0">Reinicia tu equipo y vuelve a tener 1000 monedas. Tienes hasta 3 usos.</p><p class="small" id="resetClubMessage" style="margin:5px 0 0">Tienes 3 reinicios disponibles.</p></div><button id="resetClubBtn" class="gold" onclick="resetClub()">↻ Reiniciar equipo y monedas (3 usos disponibles)</button></div>
 <div class="hero"><h1>Construye tu club.</h1><p class="sub">Ficha jugadores, mejora tu once y gana partidos. Esta primera versión guarda tu progreso en este navegador.</p>
 <div class="stats"><div class="stat"><strong id="teamRating">—</strong><span>Valoración del once</span></div><div class="stat"><strong id="wins">0</strong><span>Victorias</span></div><div class="stat"><strong id="losses">0</strong><span>Derrotas</span></div><div class="stat"><strong id="draws">0</strong><span>Empates</span></div></div></div>
 <div class="grid cols-2"><article class="card"><h2>⚽ Tu once titular</h2><p class="small">Haz clic en un jugador del once o del banquillo para intercambiarlos.</p><div id="startingXI" class="pitch-formation"></div><h3>Banquillo</h3><div id="benchPlayers" class="player-list compact"></div></article><article class="card"><h2>⚙️ Ajustes de táctica</h2><label for="formationSelect">Formación</label><select id="formationSelect" onchange="changeFormation(this.value)"><option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option><option value="3-5-2">3-5-2</option><option value="4-2-3-1">4-2-3-1</option></select><div class="notice" style="margin-top:14px">Tu alineación titular determina la valoración global de tu equipo para los partidos de liga y competiciones.</div><div style="margin-top:16px"><button onclick="autoOptimizeTeam()">⚡ Auto-optimizar mejor once</button></div></article></div>
+<div class="notice" style="margin-top:16px">Monedas actuales en el club: <strong id="clubCoins">1000</strong> 🪙</div>
 </section>
+
 <section class="view" id="clubplayers">
 <div class="card"><h2>👥 Plantilla de tu club</h2><p class="small">Jugadores en propiedad listos para jugar o alinear.</p><div id="clubPlayersList" class="player-grid"></div></div>
 </section>
+
 <section class="view" id="market">
-<div class="card"><h2>🛒 Mercado de fichajes</h2><p class="small">Ficha nuevos futbolistas para mejorar tu club. El mercado se actualiza periódicamente.</p><div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"><button class="gold" onclick="refreshMarket()">🔄 Refrescar mercado (50 🪙)</button></div><div id="marketList" class="player-grid"></div></div>
+<div class="card"><h2>🛒 Mercado de fichajes</h2><p class="small">Ficha nuevos futbolistas para mejorar tu club. Monedas disponibles: <strong id="marketCoins">1000</strong> 🪙 (Valoración once: <strong id="marketRating">—</strong>)</p><div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap"><button class="gold" onclick="refreshMarket()">🔄 Refrescar mercado (50 🪙)</button></div><div id="marketList" class="player-grid"></div></div>
 </section>
+
 <section class="view" id="match">
-<div class="card"><h2>⚽ Jornada de Liga</h2><p class="small">Simula o juega partidos contra rivales de tu nivel para ganar monedas y prestigio.</p><div id="matchArea" style="text-align:center;padding:20px 0"><button class="gold" onclick="playMatch()" style="font-size:1.1rem;padding:14px 28px">▶️ Jugar partido de liga</button></div><div id="matchLog" class="match-log" style="margin-top:16px;display:none"></div></div>
+<div class="card"><h2>⚽ Jornada de Liga</h2><p class="small">Simula o juega partidos contra rivales de tu nivel para ganar monedas y prestigio.</p>
+<div style="margin-bottom:14px; background:#12231b; padding:12px; border-radius:8px;">
+  <p style="margin:0 0 6px">Progreso de la temporada (Partidos jugados: <span id="played">0</span>)</p>
+  <div style="background:#0f172a; height:12px; border-radius:6px; overflow:hidden;"><div id="progress" style="background:#22c55e; width:0%; height:100%;"></div></div>
+  <p class="small" id="progressText" style="margin:4px 0 0">0 de 3 victorias</p>
+</div>
+<div id="matchArea" style="text-align:center;padding:20px 0"><button class="gold" onclick="playMatch()" style="font-size:1.1rem;padding:14px 28px">▶️ Jugar partido de liga</button></div><div id="matchLog" class="match-log" style="margin-top:16px;display:none"></div></div>
 </section>
+
 <section class="view" id="collection">
-<div class="card"><h2>🃏 Colección de Cartas y Sobres</h2><p class="small">Abre sobres para descubrir estrellas y completar el álbum completo del juego.</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap"><button class="gold" onclick="openPack('bronze')">📦 Sobre Bronce (150 🪙)</button><button class="gold" onclick="openPack('silver')">📦 Sobre Plata (350 🪙)</button><button class="gold" onclick="openPack('gold')">📦 Sobre Oro (750 🪙)</button><button class="gold" onclick="openPack('icon')">📦 Sobre Élite/Icon (1500 🪙)</button></div><div id="packResult" style="margin-bottom:16px"></div><h3>Álbum completo disponible</h3><div id="collectionList" class="player-grid"></div></div>
+<div class="card"><h2>🃏 Colección de Cartas y Sobres</h2><p class="small">Abre sobres para descubrir estrellas y completar el álbum del juego (Cartas en propiedad: <span id="ownedCount">0</span> / <span id="collectionCount">0</span> - Monedas: <strong id="collectionCoins">1000</strong> 🪙).</p><div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap"><button class="gold" onclick="openPack('bronze')">📦 Sobre Bronce (150 🪙)</button><button class="gold" onclick="openPack('silver')">📦 Sobre Plata (350 🪙)</button><button class="gold" onclick="openPack('gold')">📦 Sobre Oro (750 🪙)</button><button class="gold" onclick="openPack('icon')">📦 Sobre Élite/Icon (1500 🪙)</button></div><div id="packResult" style="margin-bottom:16px"></div><h3>Álbum completo disponible</h3><div id="collectionList" class="player-grid"></div></div>
 </section>
+
 <section class="view" id="futdraft">
 <div class="card"><h2>🏆 FUT Draft</h2><p class="small">Elige una formación y construye un equipo de Ensueño seleccionando 1 jugador de 5 opciones por posición. ¡Gana partidos seguidos para conseguir grandes premios!</p><div id="draftContainer"><div style="text-align:center;padding:30px"><button class="gold" onclick="startDraft()" style="font-size:1.1rem;padding:14px 28px">🚀 Iniciar nuevo FUT Draft (300 🪙)</button></div></div></div>
 </section>
+
 <section class="view" id="futchapas">
-<div class="card" style="padding:12px"><h2>🟢 FutChapas (Modo Partido de Chapas)</h2><p class="small">Lanza tus chapas por turnos para marcar gol. ¡Usa a tus jugadores titulares reales en el campo!</p>
+<div class="card" style="padding:12px"><h2>🟢 FutChapas (Modo Partido de Chapas)</h2><p class="small">Lanza tus chapas por turnos para marcar gol. ¡Tus jugadores titulares aparecen representados en el campo!</p>
 <div id="futchapas-app">
-<div class="futchapas-ui-top"><div class="futchapas-scorebox"><span id="futchapas-label-blue-team">Tus Chapas</span>: <strong id="futchapas-score-blue">0</strong></div><div class="futchapas-timer" id="futchapas-turn-indicator">Turno: Tus chapas</div><div class="futchapas-scorebox"><span id="futchapas-label-red-team">Rival</span>: <strong id="futchapas-score-red">0</strong></div></div>
+<div class="futchapas-ui-top" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:bold;"><div class="futchapas-scorebox"><span id="futchapas-label-blue-team">Tus Chapas</span>: <strong id="futchapas-score-blue">0</strong></div><div class="futchapas-timer" id="futchapas-turn-indicator" style="background:#0f172a; padding:6px 12px; border-radius:6px; color:#facc15;">Turno: Tus chapas</div><div class="futchapas-scorebox"><span id="futchapas-label-red-team">Rival</span>: <strong id="futchapas-score-red">0</strong></div></div>
 <div class="futchapas-canvas-container" style="position:relative; width:100%; max-width:720px; margin:0 auto; text-align:center;"><canvas id="futchapasCanvas" width="720" height="480" style="width:100%; height:auto; background:#1b4d3e; border:4px solid #fff; border-radius:8px; cursor:pointer; touch-action:none;"></canvas></div>
 <div style="display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap;"><button class="gold" onclick="initFutChapasGame()">🔄 Reiniciar Partido Chapas</button><button onclick="toggleFutChapasSound()">🔊 Sonido On/Off</button></div>
 </div></div>
 </section>
+
 <section class="view" id="casino">
-<div class="card"><h2>🎰 Casino de Monedas</h2><p class="small">Prueba tu suerte con juegos rápidos para conseguir más monedas para tu club.</p><h3>Ruleta Europea de Números</h3><p class="small">Elige un número del 0 al 36. Si sale exactamente ese número, recibes 36 veces la apuesta total. La apuesta máxima es de 20 monedas.</p><label for="numberBet">Apuesta</label><select id="numberBet"><option value="5">5 monedas</option><option value="10">10 monedas</option><option value="15">15 monedas</option><option value="20">20 monedas</option></select><label for="rouletteNumber">Número (0–36)</label><input id="rouletteNumber" type="number" min="0" max="36" step="1" value="7"><div class="roulette-stage" aria-label="Ruleta europea animada"><div class="roulette-pointer"></div><div class="roulette-wheel" id="numberWheel"><div class="wheel-numbers" id="numberWheelNumbers"></div><div class="wheel-center"><span>FMC</span></div></div></div><button class="gold" id="numberSpinBtn" onclick="casinoRouletteNumber()">🎯 Apostar al número</button><div id="numberResult" class="casino-result" aria-live="polite">Elige tu número.</div></article>
+<div class="card"><h2>🎰 Casino de Monedas</h2><p class="small">Prueba tu suerte con juegos rápidos para conseguir más monedas para tu club. Monedas: <strong id="casinoCoins">1000</strong> 🪙</p><h3>Ruleta Europea de Números</h3><p class="small">Elige un número del 0 al 36. Si sale exactamente ese número, recibes 36 veces la apuesta total. La apuesta máxima es de 20 monedas.</p><label for="numberBet">Apuesta</label><select id="numberBet"><option value="5">5 monedas</option><option value="10">10 monedas</option><option value="15">15 monedas</option><option value="20">20 monedas</option></select><label for="rouletteNumber">Número (0–36)</label><input id="rouletteNumber" type="number" min="0" max="36" step="1" value="7"><div class="roulette-stage" aria-label="Ruleta europea animada"><div class="roulette-pointer"></div><div class="roulette-wheel" id="numberWheel"><div class="wheel-numbers" id="numberWheelNumbers"></div><div class="wheel-center"><span>FMC</span></div></div></div><button class="gold" id="numberSpinBtn" onclick="casinoRouletteNumber()">🎯 Apostar al número</button><div id="numberResult" class="casino-result" aria-live="polite">Elige tu número.</div></article>
 </div><div class="notice">Recuerda: son monedas ficticias que solo sirven dentro de Football Manager Cards. No se puede apostar dinero real.</div>
 </section>
+
 <footer>Football Manager Cards v31 · Clubes revisados con fuentes FC 27 · Medias y atributos personalizados · Progreso guardado en este dispositivo</footer>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
