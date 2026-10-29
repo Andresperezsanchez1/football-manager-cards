@@ -395,18 +395,21 @@ window.FMC = {
   getRating(player) { return Number(player?.rating) || 0; }
 };
 
-/* --- SISTEMA DE INICIO DE SESIÓN Y MULTI-USUARIO --- */
+/* --- SISTEMA DE INICIO DE SESIÓN Y PERSISTENCIA EN FIREBASE FIRESTORE --- */
 let currentUser = localStorage.getItem("fmc-current-user") || null;
-
-function getCurrentStorageKey() {
-  return currentUser ? `fmc-save-user-${currentUser}` : "fmc-save-v2";
-}
 
 const originalSave = save;
 save = function() {
   try {
-    const key = getCurrentStorageKey();
-    localStorage.setItem(key, JSON.stringify(compactStateForStorage(state)));
+    const saveData = compactStateForStorage(state);
+    localStorage.setItem(currentUser ? `fmc-save-user-${currentUser}` : "fmc-save-v2", JSON.stringify(saveData));
+    
+    if (currentUser && window.db) {
+      window.db.collection("users").doc(currentUser).set({
+        saveData: saveData,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).catch(err => console.error("Error al sincronizar con Firebase:", err));
+    }
   } catch(e){}
   if (typeof render === 'function') render();
 };
@@ -421,7 +424,7 @@ function closeAuthModal() {
   if (m) m.style.display = 'none';
 }
 
-function submitAuth(action) {
+async function submitAuth(action) {
   const userEl = document.getElementById('authUsername');
   const passEl = document.getElementById('authPassword');
   if (!userEl || !passEl) return;
@@ -432,40 +435,50 @@ function submitAuth(action) {
     alert("Ingresa usuario y contraseña.");
     return;
   }
-  
-  const accounts = JSON.parse(localStorage.getItem("fmc-accounts") || "{}");
-  
-  if (action === 'register') {
-    if (accounts[user]) {
-      alert("El usuario ya existe. Intenta iniciar sesión.");
-      return;
-    }
-    accounts[user] = pass;
-    localStorage.setItem("fmc-accounts", JSON.stringify(accounts));
-    currentUser = user;
-    localStorage.setItem("fmc-current-user", user);
-    save();
-    alert("¡Cuenta creada con éxito!");
-  } else if (action === 'login') {
-    if (!accounts[user] || accounts[user] !== pass) {
-      alert("Usuario o contraseña incorrectos.");
-      return;
-    }
-    currentUser = user;
-    localStorage.setItem("fmc-current-user", user);
-    const raw = localStorage.getItem(getCurrentStorageKey());
-    if (raw) {
-      try {
-        const loadedState = JSON.parse(raw);
-        Object.assign(state, loadedState);
-      } catch(e){}
-    }
-    alert(`¡Bienvenido de nuevo, ${user}!`);
+
+  if (!window.db) {
+    alert("Error: Firebase no está inicializado correctamente en el HTML.");
+    return;
   }
-  
-  updateAuthUI();
-  closeAuthModal();
-  if (typeof render === 'function') render();
+
+  const userDocRef = window.db.collection("users").doc(user);
+
+  try {
+    const docSnap = await userDocRef.get();
+
+    if (action === 'register') {
+      if (docSnap.exists) {
+        alert("El usuario ya existe en la nube. Intenta iniciar sesión.");
+        return;
+      }
+      currentUser = user;
+      localStorage.setItem("fmc-current-user", user);
+      save();
+      alert("¡Cuenta creada y guardada en Firebase correctamente!");
+
+    } else if (action === 'login') {
+      if (!docSnap.exists) {
+        alert("El usuario no existe en la nube. Regístrate primero.");
+        return;
+      }
+      currentUser = user;
+      localStorage.setItem("fmc-current-user", user);
+      
+      const cloudData = docSnap.data();
+      if (cloudData && cloudData.saveData) {
+        Object.assign(state, cloudData.saveData);
+      }
+      alert(`¡Bienvenido de nuevo a la nube, ${user}!`);
+    }
+
+    updateAuthUI();
+    closeAuthModal();
+    if (typeof render === 'function') render();
+
+  } catch (error) {
+    console.error("Error en la autenticación con Firebase:", error);
+    alert("Hubo un error de conexión con Firebase. Revisa la consola (F12).");
+  }
 }
 
 function logoutUser() {
